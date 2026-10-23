@@ -1,7 +1,9 @@
 """Воспроизводимое демо с явно обозначенными тестовыми ответами API."""
 
+import argparse
 import os
 import tempfile
+from contextlib import nullcontext
 from unittest.mock import Mock, patch
 
 
@@ -27,18 +29,21 @@ def fake_response(url, **kwargs):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--live", action="store_true", help="Получить курсы CoinGecko")
+    args = parser.parse_args()
     with tempfile.TemporaryDirectory() as directory:
         os.environ["VALUTATRADE_DATA_DIR"] = directory
         os.environ["VALUTATRADE_LOGS_DIR"] = directory + "/logs"
-        os.environ["EXCHANGERATE_API_KEY"] = "demo-not-a-real-key"
+        if not args.live:
+            os.environ["EXCHANGERATE_API_KEY"] = "demo-not-a-real-key"
         from valutatrade_hub.cli.interface import execute
         from valutatrade_hub.core.usecases import TradingService
         from valutatrade_hub.logging_config import setup_logging
 
         setup_logging()
         service = TradingService()
-        print("ДЕМО: ответы API подменены тестовыми, курсы не рыночные.")
-        print("Остальной код — реальные команды, модели, JSON и журналы проекта.")
+        print("Курсы CoinGecko из API." if args.live else "Тестовые курсы, без сети.")
         commands = [
             "update-rates",
             "show-rates --top 2",
@@ -54,7 +59,13 @@ def main():
             "sell --currency BTC --amount 10",
             "buy --currency ABC --amount 1",
         ]
-        with patch("requests.get", side_effect=fake_response):
+        if args.live:
+            commands[0] = "update-rates --source coingecko"
+            commands = [command for command in commands if "EUR" not in command]
+        responses = nullcontext() if args.live else patch(
+            "requests.get", side_effect=fake_response
+        )
+        with responses:
             for command in commands:
                 print("\n> " + command, flush=True)
                 execute(command, service)

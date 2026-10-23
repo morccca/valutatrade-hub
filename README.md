@@ -5,7 +5,7 @@
 ## Запуск
 
 ```bash
-python3 -m pip install -r requirements.txt
+python3 -m pip install "prettytable>=3.12,<4" "requests>=2.32,<3"
 python3 main.py
 ```
 
@@ -60,8 +60,3 @@ exit
 `rates.json` содержит кэш, `exchange_rates.json` — историю курсов.
 TTL — 300 секунд; после истечения выполните `update-rates`.
 Изменить TTL можно через `VALUTATRADE_RATES_TTL_SECONDS`.
-Периодическое обновление в отдельном терминале:
-
-```bash
-python3 -m valutatrade_hub.parser_service.scheduler --interval 300
-```

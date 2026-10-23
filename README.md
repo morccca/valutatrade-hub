@@ -55,7 +55,7 @@ exit
 Ключи не нужно записывать в код.
 
 `main.py` — запуск. В `valutatrade_hub/`: `core/` — модели и операции,
-`cli/` — команды, `infra/` — настройки и JSON, `parser_service/` — API.
+`commands.py` — команды, `infra/` — настройки и JSON, `parser_service/` — API.
 Данные — в `data/`, логи — в `logs/`.
 `rates.json` содержит кэш, `exchange_rates.json` — историю курсов.
 TTL — 300 секунд; после истечения выполните `update-rates`.

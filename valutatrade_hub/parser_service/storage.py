@@ -1,6 +1,6 @@
 """Актуальный снимок и история измерений курсов."""
 
-from valutatrade_hub.core.utils import parse_time, utc_now, validate_amount
+from valutatrade_hub.core.utils import current_time, parse_time, validate_amount
 from valutatrade_hub.infra.database import DatabaseManager
 
 
@@ -39,7 +39,7 @@ class RatesStorage:
             snapshot["pairs"][pair] = item
             count += 1
         if count:
-            snapshot["last_refresh"] = utc_now()
+            snapshot["last_refresh"] = current_time()
             self.database.write("exchange_rates.json", history)
             self.database.write("rates.json", snapshot)
         return count

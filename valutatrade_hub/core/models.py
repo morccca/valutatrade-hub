@@ -6,7 +6,7 @@ import secrets
 
 from valutatrade_hub.core.currencies import get_currency
 from valutatrade_hub.core.exceptions import InsufficientFundsError
-from valutatrade_hub.core.utils import parse_time, utc_now, validate_amount
+from valutatrade_hub.core.utils import current_time, parse_time, validate_amount
 
 
 class User:
@@ -24,7 +24,7 @@ class User:
     @classmethod
     def create(cls, user_id, username, password):
         """Создать пользователя с новой солью и текущей датой."""
-        user = cls(user_id, username, "", "", utc_now())
+        user = cls(user_id, username, "", "", current_time())
         user.change_password(password)
         return user
 

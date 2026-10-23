@@ -60,3 +60,5 @@ exit
 `rates.json` содержит кэш, `exchange_rates.json` — историю курсов.
 TTL — 300 секунд; после истечения выполните `update-rates`.
 Изменить TTL можно через `VALUTATRADE_RATES_TTL_SECONDS`.
+
+Время регистрации, обновления курсов и записей в логах — UTC+3.

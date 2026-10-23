@@ -4,7 +4,7 @@ import json
 import logging
 from functools import wraps
 
-from valutatrade_hub.core.utils import utc_now
+from valutatrade_hub.core.utils import current_time
 
 
 def log_action(action, verbose=False):
@@ -14,7 +14,7 @@ def log_action(action, verbose=False):
         @wraps(function)
         def wrapper(self, currency_code, amount):
             record = {
-                "timestamp": utc_now(),
+                "timestamp": current_time(),
                 "action": action,
                 "user_id": self.user.user_id if self.user else None,
                 "currency_code": currency_code,

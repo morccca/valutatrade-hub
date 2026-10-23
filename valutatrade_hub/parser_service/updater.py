@@ -3,7 +3,7 @@
 import logging
 
 from valutatrade_hub.core.exceptions import ApiRequestError
-from valutatrade_hub.core.utils import utc_now
+from valutatrade_hub.core.utils import current_time
 from valutatrade_hub.parser_service.api_clients import (
     CoinGeckoClient,
     ExchangeRateApiClient,
@@ -25,13 +25,13 @@ class RatesUpdater:
     def run_update(self):
         """Опросить все источники, сохранить успехи, вернуть ошибки отдельно."""
         logger = logging.getLogger("valutatrade.parser")
-        logger.info("%s Начало обновления", utc_now())
+        logger.info("%s Начало обновления", current_time())
         updates = {}
         errors = []
         for client in self.clients:
             try:
                 rates = client.fetch_rates()
-                timestamp = utc_now()
+                timestamp = current_time()
                 for pair, rate in rates.items():
                     updates[pair] = {
                         "rate": rate,
@@ -41,9 +41,9 @@ class RatesUpdater:
                 logger.info("%s %s: %s курсов", timestamp, client.source, len(rates))
             except ApiRequestError as error:
                 errors.append(str(error))
-                logger.warning("%s %s", utc_now(), error)
+                logger.warning("%s %s", current_time(), error)
         if not updates:
             raise ApiRequestError("; ".join(errors) or "Источники не вернули курсы")
         count = self.storage.save(updates)
-        logger.info("%s Завершено: %s курсов", utc_now(), count)
+        logger.info("%s Завершено: %s курсов", current_time(), count)
         return {"updated": count, "errors": errors}

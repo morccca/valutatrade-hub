@@ -1,11 +1,9 @@
 """Операции приложения, не зависящие от ввода и печати в консоли."""
 
-from datetime import datetime, timezone
-
 from valutatrade_hub.core.currencies import CURRENCIES, CryptoCurrency, get_currency
 from valutatrade_hub.core.exceptions import ApiRequestError
 from valutatrade_hub.core.models import Portfolio, User, Wallet
-from valutatrade_hub.core.utils import parse_time, utc_now, validate_amount
+from valutatrade_hub.core.utils import current_time, parse_time, validate_amount
 from valutatrade_hub.decorators import log_action
 from valutatrade_hub.infra.database import DatabaseManager
 from valutatrade_hub.infra.settings import SettingsLoader
@@ -77,11 +75,11 @@ class TradingService:
         get_currency(from_code)
         get_currency(to_code)
         if from_code == to_code:
-            return {"rate": 1.0, "updated_at": utc_now()}
+            return {"rate": 1.0, "updated_at": current_time()}
         pairs = self.database.read("rates.json", {"pairs": {}})["pairs"]
         rates = {}
         timestamps = []
-        now = datetime.now(timezone.utc)
+        now = parse_time(current_time())
         ttl = SettingsLoader().get("rates_ttl_seconds")
         for code in (from_code, to_code):
             if code == "USD":

@@ -1,7 +1,10 @@
 """Валидация чисел и работа со временем."""
 
 import math
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
+
+
+TIMEZONE = timezone(timedelta(hours=3))
 
 
 def validate_amount(amount, allow_zero=False):
@@ -13,9 +16,9 @@ def validate_amount(amount, allow_zero=False):
     return float(amount)
 
 
-def utc_now():
-    """Текущее время в ISO UTC."""
-    return datetime.now(timezone.utc).isoformat()
+def current_time():
+    """Текущее время в ISO с часовым поясом UTC+3."""
+    return datetime.now(TIMEZONE).isoformat()
 
 
 def parse_time(value):
@@ -23,4 +26,4 @@ def parse_time(value):
     result = datetime.fromisoformat(value)
     if result.tzinfo is None:
         result = result.replace(tzinfo=timezone.utc)
-    return result
+    return result.astimezone(TIMEZONE)

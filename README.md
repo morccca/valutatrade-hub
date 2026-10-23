@@ -5,14 +5,19 @@
 
 ## Запуск
 
-Python 3.12+, uv.
+Python 3.12+, uv. Автор: Naumov Pavel.
 
 ```bash
 uv sync
 uv run valutatrade
 ```
 
-Для фиатных курсов задайте переменную `EXCHANGERATE_API_KEY`.
+Для фиатных курсов задайте переменную `EXCHANGERATE_API_KEY`:
+
+```bash
+export EXCHANGERATE_API_KEY="ваш_ключ"
+uv run valutatrade
+```
 Для CoinGecko предусмотрена `COINGECKO_DEMO_API_KEY`.
 Ключи не нужно добавлять в код или репозиторий.
 
@@ -34,7 +39,7 @@ exit
 
 `amount` — количество валюты. Покупка увеличивает её баланс, продажа
 уменьшает. Стоимость в USD показывается справочно; USD-кошелёк автоматически
-не меняется. Выбран вариант из подробного описания usecases задания.
+не меняется. 
 
 ## Структура
 
@@ -59,8 +64,12 @@ uv run python -m unittest discover -s tests
 uv build
 ```
 
-[Демонстрация](docs/demo.cast)
+![Демонстрация](docs/demo.gif)
+
+[Запись asciinema](docs/demo.cast)
 
 Запустить сценарий: `uv run python scripts/demo.py`.
 Посмотреть запись: `uvx asciinema play docs/demo.cast`.
-В демо используются тестовые ответы API и временная папка данных.
+Без флагов демо использует тестовые курсы и временные данные.
+С реальными курсами: `uv run python scripts/demo.py --live`.
+Запись выше сделана с курсами CoinGecko; фиатный API требует отдельный ключ.

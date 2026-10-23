@@ -1,8 +1,6 @@
 """Общая конфигурация приложения."""
 
 import os
-import tomllib
-from pathlib import Path
 
 
 class SettingsLoader:
@@ -17,18 +15,16 @@ class SettingsLoader:
         return cls._instance
 
     def reload(self):
-        """Перечитать TOML и переменные окружения."""
+        """Загрузить настройки из переменных окружения."""
         self._settings = {
             "data_dir": "data",
             "logs_dir": "logs",
             "rates_ttl_seconds": 300,
             "base_currency": "USD",
         }
-        path = Path(os.environ.get("VALUTATRADE_CONFIG", "pyproject.toml"))
-        if path.exists():
-            with path.open("rb") as file:
-                config = tomllib.load(file)
-            self._settings.update(config.get("tool", {}).get("valutatrade", {}))
+        self._settings["rates_ttl_seconds"] = int(
+            os.environ.get("VALUTATRADE_RATES_TTL_SECONDS", "300")
+        )
         for key in ("data_dir", "logs_dir"):
             value = os.environ.get("VALUTATRADE_" + key.upper())
             if value:

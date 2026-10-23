@@ -1,66 +1,67 @@
 # ValutaTrade Hub
 
-Автор: Naumov Pavel. Python 3.12+, [uv](https://docs.astral.sh/uv/getting-started/installation/).
-
-Консольный симулятор валютного портфеля с регистрацией, покупкой,
-продажей и получением курсов CoinGecko и ExchangeRate-API.
+Консольный симулятор валютного портфеля. Требуется Python 3.12+.
 
 ## Запуск
 
-В каталоге проекта:
-
 ```bash
-uv sync
-uv run valutatrade
+python3 -m pip install -r requirements.txt
+python3 main.py
 ```
 
-Для фиатных курсов перед запуском задайте ключ ExchangeRate-API:
+## Ввод и вывод
 
-```bash
-export EXCHANGERATE_API_KEY="ваш_ключ"
-```
-
-Необязательный ключ CoinGecko задаётся через `COINGECKO_DEMO_API_KEY`.
-Ключи хранятся в переменных окружения, в файлы проекта их добавлять не нужно.
-
-## Команды
+Введите команды:
 
 ```text
-update-rates
 register --username student --password example1234
 login --username student --password example1234
+buy --currency USD --amount 100
+show-portfolio
+```
+
+Результат просмотра портфеля:
+
+```text
+Портфель пользователя 'student' (база: USD):
++--------+----------+----------------+
+| Валюта |  Баланс  | Стоимость, USD |
++--------+----------+----------------+
+|  USD   | 100.0000 |     100.00     |
++--------+----------+----------------+
+ИТОГО: 100.00 USD
+```
+
+Для криптовалют сначала загрузите курсы:
+
+```text
+update-rates --source coingecko
 buy --currency BTC --amount 0.05
 sell --currency BTC --amount 0.01
-show-portfolio
-show-portfolio --base EUR
 get-rate --from USD --to BTC
 show-rates --top 2
-show-rates --currency EUR
 help
 exit
 ```
 
-`amount` — количество валюты. Покупка увеличивает её баланс, продажа
-уменьшает. Стоимость в USD справочная: USD-кошелёк автоматически не меняется.
+Покупка пополняет выбранную валюту, продажа списывает её.
+Стоимость в USD справочная; автоматического обмена с USD-кошельком нет.
 
-## Структура и курсы
+## Курсы и файлы
 
-В `valutatrade_hub/`: `core/` — модели и операции, `cli/` — команды,
-`infra/` — настройки и хранилище, `parser_service/` — загрузка курсов.
-Данные находятся в `data/`, журналы операций — в `logs/`.
+Для фиатных курсов задайте `EXCHANGERATE_API_KEY` в окружении перед запуском.
+Необязательный ключ CoinGecko: `COINGECKO_DEMO_API_KEY`.
+`update-rates` обновляет оба источника, `show-rates` показывает курсы.
+Ключи не нужно записывать в код.
 
-Parser Service запускается командой `update-rates` внутри приложения.
-Только криптовалюты: `update-rates --source coingecko`;
-только фиатные валюты: `update-rates --source exchangerate`.
-Для обновления по расписанию в отдельном терминале:
+`main.py` — запуск. В `valutatrade_hub/`: `core/` — модели и операции,
+`cli/` — команды, `infra/` — настройки и JSON, `parser_service/` — API.
+Данные — в `data/`, логи — в `logs/`.
+`rates.json` содержит кэш, `exchange_rates.json` — историю курсов.
+TTL — 300 секунд; после истечения выполните `update-rates`.
+Изменить TTL можно через `VALUTATRADE_RATES_TTL_SECONDS`.
+Периодическое обновление в отдельном терминале:
 
 ```bash
-uv run python -m valutatrade_hub.parser_service.scheduler --interval 300
+python3 -m valutatrade_hub.parser_service.scheduler --interval 300
 ```
-
-`data/rates.json` — кэш курсов, `data/exchange_rates.json` — история.
-TTL по умолчанию — 300 секунд. Просроченные курсы нужно обновить через
-`update-rates`. TTL и пути задаются в `[tool.valutatrade]` файла
-`pyproject.toml`, параметры API — в `parser_service/config.py`.
-
-Проверка стиля: `uv run ruff check .`. Сборка пакета: `uv build`.
